@@ -48,7 +48,7 @@ public class InputStreamConsumer extends Thread {
         LOG.info(line);
       }
     } catch (IOException ioe) {
-      LOG.error(ioe.toString());
+      LOG.error("Process output failed,err",ioe);
       ioe.printStackTrace();
     }
   }

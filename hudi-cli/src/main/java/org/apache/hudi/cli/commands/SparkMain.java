@@ -53,7 +53,7 @@ public class SparkMain {
 
   public static void main(String[] args) throws Exception {
     String command = args[0];
-    LOG.info("Invoking SparkMain:" + command);
+    LOG.info("Invoking SparkMain {} " + command);
 
     SparkCommand cmd = SparkCommand.valueOf(command);
 
@@ -226,10 +226,10 @@ public class SparkMain {
   private static int rollback(JavaSparkContext jsc, String commitTime, String basePath) throws Exception {
     HoodieWriteClient client = createHoodieClient(jsc, basePath);
     if (client.rollback(commitTime)) {
-      LOG.info(String.format("The commit \"%s\" rolled back.", commitTime));
+      LOG.info("The commit {} rolled back.",commitTime);
       return 0;
     } else {
-      LOG.info(String.format("The commit \"%s\" failed to roll back.", commitTime));
+      LOG.info("The commit {} failed to roll back.", commitTime);
       return -1;
     }
   }
@@ -237,10 +237,10 @@ public class SparkMain {
   private static int rollbackToSavepoint(JavaSparkContext jsc, String savepointTime, String basePath) throws Exception {
     HoodieWriteClient client = createHoodieClient(jsc, basePath);
     if (client.rollbackToSavepoint(savepointTime)) {
-      LOG.info(String.format("The commit \"%s\" rolled back.", savepointTime));
+      LOG.info("The commit {} rolled back.", savepointTime);
       return 0;
     } else {
-      LOG.info(String.format("The commit \"%s\" failed to roll back.", savepointTime));
+      LOG.info("The commit {} failed to roll back.", savepointTime);
       return -1;
     }
   }

@@ -250,7 +250,7 @@ public class CompactionCommand implements CommandMarker {
     ObjectInputStream in = new ObjectInputStream(fsDataInputStream);
     try {
       T result = (T) in.readObject();
-      LOG.info("Result : " + result);
+      LOG.info("Result {} " + result);
       return result;
     } finally {
       in.close();
