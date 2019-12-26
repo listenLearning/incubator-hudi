@@ -108,8 +108,8 @@ class RealtimeCompactedRecordReader extends AbstractRealtimeRecordReader
         ArrayWritable aWritable = (ArrayWritable) avroToArrayWritable(recordToReturn, getHiveSchema());
         Writable[] replaceValue = aWritable.get();
         if (LOG.isDebugEnabled()) {
-          LOG.debug(String.format("key %s, base values: %s, log values: %s", key, arrayWritableToString(arrayWritable),
-              arrayWritableToString(aWritable)));
+          LOG.debug("key {}, base values: {}, log values: {}", key, arrayWritableToString(arrayWritable),
+              arrayWritableToString(aWritable));
         }
         Writable[] originalValue = arrayWritable.get();
         try {
@@ -117,8 +117,8 @@ class RealtimeCompactedRecordReader extends AbstractRealtimeRecordReader
           arrayWritable.set(originalValue);
         } catch (RuntimeException re) {
           LOG.error("Got exception when doing array copy", re);
-          LOG.error("Base record :" + arrayWritableToString(arrayWritable));
-          LOG.error("Log record :" + arrayWritableToString(aWritable));
+          LOG.error("Base record :{}", arrayWritableToString(arrayWritable));
+          LOG.error("Log record :{}", arrayWritableToString(aWritable));
           String errMsg = "Base-record :" + arrayWritableToString(arrayWritable)
               + " ,Log-record :" + arrayWritableToString(aWritable) + " ,Error :" + re.getMessage();
           throw new RuntimeException(errMsg, re);

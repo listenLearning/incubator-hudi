@@ -88,7 +88,7 @@ public class HoodieROTablePathFilter implements PathFilter, Serializable {
   public boolean accept(Path path) {
 
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Checking acceptance for path " + path);
+      LOG.debug("Checking acceptance for path {}", path);
     }
     Path folder = null;
     try {
@@ -101,15 +101,15 @@ public class HoodieROTablePathFilter implements PathFilter, Serializable {
       // Try to use the caches.
       if (nonHoodiePathCache.contains(folder.toString())) {
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Accepting non-hoodie path from cache: " + path);
+          LOG.debug("Accepting non-hoodie path from cache: {}", path);
         }
         return true;
       }
 
       if (hoodiePathCache.containsKey(folder.toString())) {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(String.format("%s Hoodie path checked against cache, accept => %s \n", path,
-              hoodiePathCache.get(folder.toString()).contains(path)));
+          LOG.debug("{} Hoodie path checked against cache, accept => {} \n", path,
+              hoodiePathCache.get(folder.toString()).contains(path));
         }
         return hoodiePathCache.get(folder.toString()).contains(path);
       }
@@ -119,7 +119,7 @@ public class HoodieROTablePathFilter implements PathFilter, Serializable {
       if (filePath.contains("/" + HoodieTableMetaClient.METAFOLDER_NAME + "/")
           || filePath.endsWith("/" + HoodieTableMetaClient.METAFOLDER_NAME)) {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(String.format("Skipping Hoodie Metadata file  %s \n", filePath));
+          LOG.debug("Skipping Hoodie Metadata file  {} \n", filePath);
         }
         return false;
       }
@@ -144,22 +144,21 @@ public class HoodieROTablePathFilter implements PathFilter, Serializable {
           if (!hoodiePathCache.containsKey(folder.toString())) {
             hoodiePathCache.put(folder.toString(), new HashSet<>());
           }
-          LOG.info("Based on hoodie metadata from base path: " + baseDir.toString() + ", caching " + latestFiles.size()
-              + " files under " + folder);
+          LOG.info("Based on hoodie metadata from base path: {}, caching {} files under {}",baseDir.toString(),latestFiles.size(), folder);
           for (HoodieDataFile lfile : latestFiles) {
             hoodiePathCache.get(folder.toString()).add(new Path(lfile.getPath()));
           }
 
           // accept the path, if its among the latest files.
           if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("%s checked after cache population, accept => %s \n", path,
-                hoodiePathCache.get(folder.toString()).contains(path)));
+            LOG.debug("{} checked after cache population, accept => {} \n", path,
+                hoodiePathCache.get(folder.toString()).contains(path));
           }
           return hoodiePathCache.get(folder.toString()).contains(path);
         } catch (DatasetNotFoundException e) {
           // Non-hoodie path, accept it.
           if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("(1) Caching non-hoodie path under %s \n", folder.toString()));
+            LOG.debug("(1) Caching non-hoodie path under {} \n", folder.toString());
           }
           nonHoodiePathCache.add(folder.toString());
           return true;
@@ -167,7 +166,7 @@ public class HoodieROTablePathFilter implements PathFilter, Serializable {
       } else {
         // files is at < 3 level depth in FS tree, can't be hoodie dataset
         if (LOG.isDebugEnabled()) {
-          LOG.debug(String.format("(2) Caching non-hoodie path under %s \n", folder.toString()));
+          LOG.debug("(2) Caching non-hoodie path under {} \n", folder.toString());
         }
         nonHoodiePathCache.add(folder.toString());
         return true;

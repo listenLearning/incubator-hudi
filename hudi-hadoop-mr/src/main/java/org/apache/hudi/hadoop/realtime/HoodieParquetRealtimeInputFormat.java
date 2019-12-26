@@ -148,7 +148,7 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
         throw new HoodieException("Error obtaining data file/log file grouping: " + partitionPath, e);
       }
     });
-    LOG.info("Returning a total splits of " + rtSplits.size());
+    LOG.info("Returning a total splits of {}", rtSplits.size());
     return rtSplits.toArray(new InputSplit[rtSplits.size()]);
   }
 
@@ -180,9 +180,9 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
       conf.set(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR, readColNamesPrefix + fieldName);
       conf.set(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR, readColIdsPrefix + fieldIndex);
       if (LOG.isDebugEnabled()) {
-        LOG.debug(String.format("Adding extra column " + fieldName + ", to enable log merging cols (%s) ids (%s) ",
+        LOG.debug("Adding extra column {}, to enable log merging cols ({}) ids ({}) ",fieldName,
             conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR),
-            conf.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR)));
+            conf.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
       }
     }
     return conf;
@@ -210,7 +210,7 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
     if (!columnIds.isEmpty() && columnIds.charAt(0) == ',') {
       conf.set(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR, columnIds.substring(1));
       if (LOG.isDebugEnabled()) {
-        LOG.debug("The projection Ids: {" + columnIds + "} start with ','. First comma is removed");
+        LOG.debug("The projection Ids: ({}) start with ','. First comma is removed",columnIds);
       }
     }
     return conf;
@@ -227,8 +227,7 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
     if (job.get(HOODIE_READ_COLUMNS_PROP) == null) {
       synchronized (job) {
         LOG.info(
-            "Before adding Hoodie columns, Projections :" + job.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR)
-                + ", Ids :" + job.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
+            "Before adding Hoodie columns, Projections :{}, Ids :{}",job.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR), job.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
         if (job.get(HOODIE_READ_COLUMNS_PROP) == null) {
           // Hive (across all versions) fails for queries like select count(`_hoodie_commit_time`) from table;
           // In this case, the projection fields gets removed. Looking at HiveInputFormat implementation, in some cases
@@ -244,8 +243,7 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
       }
     }
 
-    LOG.info("Creating record reader with readCols :" + job.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR)
-        + ", Ids :" + job.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
+    LOG.info("Creating record reader with readCols :{}, Ids :{}", job.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR), job.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
     // sanity check
     Preconditions.checkArgument(split instanceof HoodieRealtimeFileSplit,
         "HoodieRealtimeRecordReader can only work on HoodieRealtimeFileSplit and not with " + split);
