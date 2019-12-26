@@ -33,8 +33,8 @@ import scala.collection.mutable._
 
 
 /**
-  * Spark job to de-duplicate data present in a partition path
-  */
+ * Spark job to de-duplicate data present in a partition path
+ */
 class DedupeSparkJob(basePath: String,
                      duplicatedPartitionPath: String,
                      repairOutputPath: String,
@@ -47,10 +47,10 @@ class DedupeSparkJob(basePath: String,
 
 
   /**
-    *
-    * @param tblName
-    * @return
-    */
+   *
+   * @param tblName
+   * @return
+   */
   def getDupeKeyDF(tblName: String): DataFrame = {
     val dupeSql =
       s"""
@@ -65,12 +65,12 @@ class DedupeSparkJob(basePath: String,
 
 
   /**
-    *
-    * Check a given partition for duplicates and suggest the deletions that need to be done in each file,
-    * in order to set things right.
-    *
-    * @return
-    */
+   *
+   * Check a given partition for duplicates and suggest the deletions that need to be done in each file,
+   * in order to set things right.
+   *
+   * @return
+   */
   private def planDuplicateFix(): HashMap[String, HashSet[String]] = {
 
     val tmpTableName = s"htbl_${System.currentTimeMillis()}"
@@ -82,7 +82,7 @@ class DedupeSparkJob(basePath: String,
     val fsView = new HoodieTableFileSystemView(metadata, metadata.getActiveTimeline.getCommitTimeline.filterCompletedInstants(), allFiles)
     val latestFiles: java.util.List[HoodieDataFile] = fsView.getLatestDataFiles().collect(Collectors.toList[HoodieDataFile]())
     val filteredStatuses = latestFiles.map(f => f.getPath)
-    LOG.info(s" List of files under partition: ${} =>  ${filteredStatuses.mkString(" ")}")
+    LOG.info("List of files under partition: {}", filteredStatuses.mkString(" "))
 
     val df = sqlContext.parquetFile(filteredStatuses: _*)
     df.registerTempTable(tmpTableName)
@@ -141,7 +141,7 @@ class DedupeSparkJob(basePath: String,
     fileNameToPathMap.foreach { case (fileName, filePath) =>
       val badSuffix = if (dupeFixPlan.contains(fileName)) ".bad" else ""
       val dstPath = new Path(s"$repairOutputPath/${filePath.getName}$badSuffix")
-      LOG.info(s"Copying from $filePath to $dstPath")
+      LOG.info("Copying from {} to {}", Array(filePath, dstPath): _*)
       FileUtil.copy(fs, filePath, fs, dstPath, false, true, fs.getConf)
     }
 
@@ -150,7 +150,7 @@ class DedupeSparkJob(basePath: String,
       val commitTime = FSUtils.getCommitTime(fileNameToPathMap(fileName).getName)
       val badFilePath = new Path(s"$repairOutputPath/${fileNameToPathMap(fileName).getName}.bad")
       val newFilePath = new Path(s"$repairOutputPath/${fileNameToPathMap(fileName).getName}")
-      LOG.info(" Skipping and writing new file for : " + fileName)
+      LOG.info(" Skipping and writing new file for : {}", fileName)
       SparkHelpers.skipKeysAndWriteNewFile(commitTime, fs, badFilePath, newFilePath, dupeFixPlan(fileName))
       fs.delete(badFilePath, false)
     }
@@ -182,10 +182,10 @@ class DedupeSparkJob(basePath: String,
       val srcPath = new Path(s"$repairOutputPath/${filePath.getName}")
       val dstPath = new Path(s"$basePath/$duplicatedPartitionPath/${filePath.getName}")
       if (dryRun) {
-        LOG.info(s"[JUST KIDDING!!!] Copying from $srcPath to $dstPath")
+        LOG.info("[JUST KIDDING!!!] Copying from {} to {}", Array(srcPath, dstPath): _*)
       } else {
         // for real
-        LOG.info(s"[FOR REAL!!!] Copying from $srcPath to $dstPath")
+        LOG.info("[FOR REAL!!!] Copying from {} to {}", Array(srcPath, dstPath): _*)
         FileUtil.copy(fs, srcPath, fs, dstPath, false, true, fs.getConf)
       }
     }
