@@ -88,7 +88,7 @@ public class SchedulerConfGenerator {
     BufferedWriter bw = new BufferedWriter(new FileWriter(tempConfigFile));
     bw.write(generateConfig(deltaSyncWeight, compactionWeight, deltaSyncMinShare, compactionMinShare));
     bw.close();
-    LOG.info("Configs written to file" + tempConfigFile.getAbsolutePath());
+    LOG.info("Configs written to file {}", tempConfigFile.getAbsolutePath());
     return tempConfigFile.getAbsolutePath();
   }
 }

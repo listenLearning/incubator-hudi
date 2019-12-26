@@ -129,10 +129,10 @@ public class HiveIncrementalPuller {
     try {
       if (config.fromCommitTime == null) {
         config.fromCommitTime = inferCommitTime(fs);
-        LOG.info("FromCommitTime inferred as " + config.fromCommitTime);
+        LOG.info("FromCommitTime inferred as {}", config.fromCommitTime);
       }
 
-      LOG.info("FromCommitTime - " + config.fromCommitTime);
+      LOG.info("FromCommitTime - {}", config.fromCommitTime);
       String sourceTableLocation = getTableLocation(config.sourceDb, config.sourceTable);
       String lastCommitTime = getLastCommitTimePulled(fs, sourceTableLocation);
       if (lastCommitTime == null) {
@@ -180,15 +180,13 @@ public class HiveIncrementalPuller {
     incrementalPullSQLtemplate.add("storedAsClause", storedAsClause);
     String incrementalSQL = new Scanner(new File(config.incrementalSQLFile)).useDelimiter("\\Z").next();
     if (!incrementalSQL.contains(config.sourceDb + "." + config.sourceTable)) {
-      LOG.info("Incremental SQL does not have " + config.sourceDb + "." + config.sourceTable
-          + ", which means its pulling from a different table. Fencing this from happening.");
+      LOG.info("Incremental SQL does not have {}.{}, which means its pulling from a different table. Fencing this from happening.",config.sourceDb,config.sourceTable);
       throw new HoodieIncrementalPullSQLException(
           "Incremental SQL does not have " + config.sourceDb + "." + config.sourceTable);
     }
     if (!incrementalSQL.contains("`_hoodie_commit_time` > '%targetBasePath'")) {
-      LOG.info("Incremental SQL : " + incrementalSQL
-          + " does not contain `_hoodie_commit_time` > '%targetBasePath'. Please add "
-          + "this clause for incremental to work properly.");
+      LOG.info("Incremental SQL : {} does not contain `_hoodie_commit_time` > '%targetBasePath'. Please add "
+          + "this clause for incremental to work properly.", incrementalSQL);
       throw new HoodieIncrementalPullSQLException(
           "Incremental SQL does not have clause `_hoodie_commit_time` > '%targetBasePath', which "
               + "means its not pulling incrementally");
@@ -224,18 +222,18 @@ public class HiveIncrementalPuller {
   }
 
   private boolean deleteHDFSPath(FileSystem fs, String path) throws IOException {
-    LOG.info("Deleting path " + path);
+    LOG.info("Deleting path {}", path);
     return fs.delete(new Path(path), true);
   }
 
   private void executeStatement(String sql, Statement stmt) throws SQLException {
-    LOG.info("Executing: " + sql);
+    LOG.info("Executing: {}", sql);
     stmt.execute(sql);
   }
 
   private String inferCommitTime(FileSystem fs) throws SQLException, IOException {
-    LOG.info("FromCommitTime not specified. Trying to infer it from Hoodie dataset " + config.targetDb + "."
-        + config.targetTable);
+    LOG.info("FromCommitTime not specified. Trying to infer it from Hoodie dataset {}.{}",config.targetDb,
+        config.targetTable);
     String targetDataLocation = getTableLocation(config.targetDb, config.targetTable);
     return scanForCommitTime(fs, targetDataLocation);
   }
@@ -249,7 +247,7 @@ public class HiveIncrementalPuller {
       resultSet = stmt.executeQuery("describe formatted `" + db + "." + table + "`");
       while (resultSet.next()) {
         if (resultSet.getString(1).trim().equals("Location:")) {
-          LOG.info("Inferred table location for " + db + "." + table + " as " + resultSet.getString(2));
+          LOG.info("Inferred table location for {}.{} as {}", db, table, resultSet.getString(2));
           return resultSet.getString(2);
         }
       }
@@ -290,7 +288,7 @@ public class HiveIncrementalPuller {
   private boolean ensureTempPathExists(FileSystem fs, String lastCommitTime) throws IOException {
     Path targetBaseDirPath = new Path(config.hoodieTmpDir, config.targetTable + "__" + config.sourceTable);
     if (!fs.exists(targetBaseDirPath)) {
-      LOG.info("Creating " + targetBaseDirPath + " with permission drwxrwxrwx");
+      LOG.info("Creating {} with permission drwxrwxrwx",targetBaseDirPath);
       boolean result =
           FileSystem.mkdirs(fs, targetBaseDirPath, new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.ALL));
       if (!result) {
@@ -305,7 +303,7 @@ public class HiveIncrementalPuller {
         throw new HoodieException("Could not delete existing " + targetPath);
       }
     }
-    LOG.info("Creating " + targetPath + " with permission drwxrwxrwx");
+    LOG.info("Creating {} with permission drwxrwxrwx", targetPath);
     return FileSystem.mkdirs(fs, targetBaseDirPath, new FsPermission(FsAction.ALL, FsAction.ALL, FsAction.ALL));
   }
 
@@ -315,20 +313,18 @@ public class HiveIncrementalPuller {
         .findInstantsAfter(config.fromCommitTime, config.maxCommits).getInstants().map(HoodieInstant::getTimestamp)
         .collect(Collectors.toList());
     if (commitsToSync.isEmpty()) {
-      LOG.warn(
-          "Nothing to sync. All commits in "
-              + config.sourceTable + " are " + metadata.getActiveTimeline().getCommitsTimeline()
-                  .filterCompletedInstants().getInstants().collect(Collectors.toList())
-              + " and from commit time is " + config.fromCommitTime);
+        LOG.warn("Nothing to sync. All commits in {} are {} and and from commit time is {}",config.sourceTable,
+                metadata.getActiveTimeline().getCommitsTimeline().filterCompletedInstants().getInstants().collect(Collectors.toList()),
+                config.fromCommitTime);
       return null;
     }
-    LOG.info("Syncing commits " + commitsToSync);
+    LOG.info("Syncing commits {}", commitsToSync);
     return commitsToSync.get(commitsToSync.size() - 1);
   }
 
   private Connection getConnection() throws SQLException {
     if (connection == null) {
-      LOG.info("Getting Hive Connection to " + config.hiveJDBCUrl);
+      LOG.info("Getting Hive Connection to {}", config.hiveJDBCUrl);
       this.connection = DriverManager.getConnection(config.hiveJDBCUrl, config.hiveUsername, config.hivePassword);
 
     }

@@ -83,17 +83,17 @@ public class HoodieSnapshotCopier implements Serializable {
       return;
     }
     final String latestCommitTimestamp = latestCommit.get().getTimestamp();
-    LOG.info(String.format("Starting to snapshot latest version files which are also no-late-than %s.",
-        latestCommitTimestamp));
+    LOG.info("Starting to snapshot latest version files which are also no-late-than {}.",
+        latestCommitTimestamp);
 
     List<String> partitions = FSUtils.getAllPartitionPaths(fs, baseDir, shouldAssumeDatePartitioning);
     if (partitions.size() > 0) {
-      LOG.info(String.format("The job needs to copy %d partitions.", partitions.size()));
+      LOG.info("The job needs to copy {} partitions.", partitions.size());
 
       // Make sure the output directory is empty
       Path outputPath = new Path(outputDir);
       if (fs.exists(outputPath)) {
-        LOG.warn(String.format("The output path %s targetBasePath already exists, deleting", outputPath));
+        LOG.warn("The output path {} targetBasePath already exists, deleting", outputPath);
         fs.delete(new Path(outputDir), true);
       }
 
@@ -126,7 +126,7 @@ public class HoodieSnapshotCopier implements Serializable {
       });
 
       // Also copy the .commit files
-      LOG.info(String.format("Copying .commit files which are no-late-than %s.", latestCommitTimestamp));
+      LOG.info("Copying .commit files which are no-late-than {}.", latestCommitTimestamp);
       FileStatus[] commitFilesToCopy =
           fs.listStatus(new Path(baseDir + "/" + HoodieTableMetaClient.METAFOLDER_NAME), (commitFilePath) -> {
             if (commitFilePath.getName().equals(HoodieTableConfig.HOODIE_PROPERTIES_FILE)) {
@@ -145,7 +145,7 @@ public class HoodieSnapshotCopier implements Serializable {
         }
         if (fs.exists(targetFilePath)) {
           LOG.error(
-              String.format("The target output commit file (%s targetBasePath) already exists.", targetFilePath));
+              "The target output commit file ({} targetBasePath) already exists.", targetFilePath);
         }
         FileUtil.copy(fs, commitStatus.getPath(), fs, targetFilePath, false, fs.getConf());
       }
@@ -156,7 +156,7 @@ public class HoodieSnapshotCopier implements Serializable {
     // Create the _SUCCESS tag
     Path successTagPath = new Path(outputDir + "/_SUCCESS");
     if (!fs.exists(successTagPath)) {
-      LOG.info(String.format("Creating _SUCCESS under targetBasePath: $s", outputDir));
+      LOG.info("Creating _SUCCESS under targetBasePath: {}", outputDir);
       fs.createNewFile(successTagPath);
     }
   }
@@ -165,8 +165,8 @@ public class HoodieSnapshotCopier implements Serializable {
     // Take input configs
     final Config cfg = new Config();
     new JCommander(cfg, args);
-    LOG.info(String.format("Snapshot hoodie table from %s targetBasePath to %stargetBasePath", cfg.basePath,
-        cfg.outputPath));
+    LOG.info("Snapshot hoodie table from {} targetBasePath to {} targetBasePath", cfg.basePath,
+        cfg.outputPath);
 
     // Create a spark job to do the snapshot copy
     SparkConf sparkConf = new SparkConf().setAppName("Hoodie-snapshot-copier");

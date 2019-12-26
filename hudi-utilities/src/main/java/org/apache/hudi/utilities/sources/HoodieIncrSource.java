@@ -109,7 +109,7 @@ public class HoodieIncrSource extends RowSource {
         numInstantsPerFetch, beginInstant, readLatestOnMissingCkpt);
 
     if (instantEndpts.getKey().equals(instantEndpts.getValue())) {
-      LOG.warn("Already caught up. Begin Checkpoint was :" + instantEndpts.getKey());
+      LOG.warn("Already caught up. Begin Checkpoint was : {}", instantEndpts.getKey());
       return Pair.of(Option.empty(), instantEndpts.getKey());
     }
 

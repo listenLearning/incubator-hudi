@@ -95,7 +95,7 @@ public class HiveIncrPullSource extends AvroSource {
       commitTimes.add(splits[splits.length - 1]);
     }
     Collections.sort(commitTimes);
-    LOG.info("Retrieved commit times " + commitTimes);
+    LOG.info("Retrieved commit times {}", commitTimes);
 
     if (!latestTargetCommit.isPresent()) {
       // start from the beginning

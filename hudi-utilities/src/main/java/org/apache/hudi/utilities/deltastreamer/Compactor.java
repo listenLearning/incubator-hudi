@@ -48,12 +48,12 @@ public class Compactor implements Serializable {
   }
 
   public void compact(HoodieInstant instant) throws IOException {
-    LOG.info("Compactor executing compaction " + instant);
+    LOG.info("Compactor executing compaction {}", instant);
     JavaRDD<WriteStatus> res = compactionClient.compact(instant.getTimestamp());
     long numWriteErrors = res.collect().stream().filter(r -> r.hasErrors()).count();
     if (numWriteErrors != 0) {
       // We treat even a single error in compaction as fatal
-      LOG.error("Compaction for instant (" + instant + ") failed with write errors. Errors :" + numWriteErrors);
+      LOG.error("Compaction for instant ({}) failed with write errors. Errors :{}", instant, numWriteErrors);
       throw new HoodieException(
           "Compaction for instant (" + instant + ") failed with write errors. Errors :" + numWriteErrors);
     }

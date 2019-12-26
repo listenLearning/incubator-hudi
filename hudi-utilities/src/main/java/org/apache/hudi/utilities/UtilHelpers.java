@@ -97,7 +97,7 @@ public class UtilHelpers {
       conf = new DFSPropertiesConfiguration(cfgPath.getFileSystem(fs.getConf()), cfgPath);
     } catch (Exception e) {
       conf = new DFSPropertiesConfiguration();
-      LOG.warn("Unexpected error read props file at :" + cfgPath, e);
+      LOG.warn("Unexpected error read props file at :{}", cfgPath, e);
     }
 
     try {
@@ -214,14 +214,14 @@ public class UtilHelpers {
     writeResponse.foreach(writeStatus -> {
       if (writeStatus.hasErrors()) {
         errors.add(1);
-        LOG.error(String.format("Error processing records :writeStatus:%s", writeStatus.getStat().toString()));
+        LOG.error("Error processing records :writeStatus:{}", writeStatus.getStat().toString());
       }
     });
     if (errors.value() == 0) {
-      LOG.info(String.format("Dataset imported into hoodie dataset with %s instant time.", instantTime));
+      LOG.info("Dataset imported into hoodie dataset with {} instant time.", instantTime);
       return 0;
     }
-    LOG.error(String.format("Import failed with %d errors.", errors.value()));
+    LOG.error("Import failed with {} errors.", errors.value());
     return -1;
   }
 
