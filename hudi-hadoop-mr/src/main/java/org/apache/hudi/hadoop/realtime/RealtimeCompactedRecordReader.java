@@ -108,8 +108,8 @@ class RealtimeCompactedRecordReader extends AbstractRealtimeRecordReader
         ArrayWritable aWritable = (ArrayWritable) avroToArrayWritable(recordToReturn, getHiveSchema());
         Writable[] replaceValue = aWritable.get();
         if (LOG.isDebugEnabled()) {
-          LOG.debug("key {}, base values: {}, log values: {}", key, arrayWritableToString(arrayWritable),
-              arrayWritableToString(aWritable));
+          LOG.debug("key {}, base values: {}, log values: {}", new Object[]{key, arrayWritableToString(arrayWritable),
+                  arrayWritableToString(aWritable)});
         }
         Writable[] originalValue = arrayWritable.get();
         try {

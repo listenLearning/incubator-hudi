@@ -180,9 +180,9 @@ public class HoodieParquetRealtimeInputFormat extends HoodieParquetInputFormat i
       conf.set(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR, readColNamesPrefix + fieldName);
       conf.set(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR, readColIdsPrefix + fieldIndex);
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Adding extra column {}, to enable log merging cols ({}) ids ({}) ",fieldName,
-            conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR),
-            conf.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR));
+        LOG.debug("Adding extra column {}, to enable log merging cols ({}) ids ({}) ",new Object[]{fieldName,
+                conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR),
+                conf.get(ColumnProjectionUtils.READ_COLUMN_IDS_CONF_STR)});
       }
     }
     return conf;

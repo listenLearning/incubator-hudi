@@ -67,7 +67,7 @@ public class SchemaUtil {
     } catch (IOException e) {
       throw new HoodieHiveSyncException("Failed to convert parquet schema to hive schema", e);
     }
-    LOG.info("Getting schema difference for " + tableSchema + "\r\n\r\n" + newTableSchema);
+    LOG.info("Getting schema difference for {}\r\n\r\n {}", tableSchema, newTableSchema);
     SchemaDifference.Builder schemaDiffBuilder = SchemaDifference.newBuilder(storageSchema, tableSchema);
     Set<String> tableColumns = Sets.newHashSet();
 
@@ -85,7 +85,7 @@ public class SchemaUtil {
             continue;
           }
           // We will log this and continue. Hive schema is a superset of all parquet schemas
-          LOG.warn("Ignoring table column " + fieldName + " as its not present in the parquet schema");
+          LOG.warn("Ignoring table column {} as its not present in the parquet schema", fieldName);
           continue;
         }
         tableColumnType = tableColumnType.replaceAll("\\s+", "");
@@ -112,7 +112,7 @@ public class SchemaUtil {
         schemaDiffBuilder.addTableColumn(entry.getKey(), entry.getValue());
       }
     }
-    LOG.info("Difference between schemas: " + schemaDiffBuilder.build().toString());
+    LOG.info("Difference between schemas: {}", schemaDiffBuilder.build().toString());
 
     return schemaDiffBuilder.build();
   }
