@@ -45,7 +45,6 @@ public class DefaultHBaseQPSResourceAllocator implements HBaseIndexQPSResourceAl
   @Override
   public void releaseQPSResources() {
     // Do nothing, as there are no resources locked in default implementation
-    LOG.info(String.format("Release QPS resources called for %s with default implementation, do nothing",
-        this.hoodieWriteConfig.getHbaseTableName()));
+    LOG.info("Release QPS resources called for {} with default implementation, do nothing", this.hoodieWriteConfig.getHbaseTableName());
   }
 }

@@ -123,8 +123,8 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
       }
     });
     long storePartitionsTs = timer.endTimer();
-    LOG.info("addFilesToView: NumFiles=" + statuses.length + ", FileGroupsCreationTime=" + fgBuildTimeTakenMs
-        + ", StoreTimeTaken=" + storePartitionsTs);
+    LOG.info("addFilesToView: NumFiles={}, FileGroupsCreationTime={}, StoreTimeTaken={}",
+            new Object[]{statuses.length, fgBuildTimeTakenMs, storePartitionsTs});
     return fileGroups;
   }
 
@@ -216,7 +216,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
       if (!isPartitionAvailableInStore(partitionPathStr)) {
         // Not loaded yet
         try {
-          LOG.info("Building file system view for partition (" + partitionPathStr + ")");
+          LOG.info("Building file system view for partition ({})",partitionPathStr);
 
           // Create the path if it does not exist already
           Path partitionPath = FSUtils.getPartitionPath(metaClient.getBasePath(), partitionPathStr);
@@ -224,8 +224,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
           long beginLsTs = System.currentTimeMillis();
           FileStatus[] statuses = metaClient.getFs().listStatus(partitionPath);
           long endLsTs = System.currentTimeMillis();
-          LOG.info("#files found in partition (" + partitionPathStr + ") =" + statuses.length + ", Time taken ="
-              + (endLsTs - beginLsTs));
+          LOG.info("#files found in partition ({}) ={}, Time taken ={}", new Object[]{partitionPathStr, statuses.length, (endLsTs - beginLsTs)});
           List<HoodieFileGroup> groups = addFilesToView(statuses);
 
           if (groups.isEmpty()) {
@@ -235,10 +234,10 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
           throw new HoodieIOException("Failed to list data files in partition " + partitionPathStr, e);
         }
       } else {
-        LOG.debug("View already built for Partition :" + partitionPathStr + ", FOUND is ");
+        LOG.debug("View already built for Partition :{}, FOUND is ", partitionPathStr);
       }
       long endTs = System.currentTimeMillis();
-      LOG.info("Time to load partition (" + partitionPathStr + ") =" + (endTs - beginTs));
+      LOG.info("Time to load partition ({}) ={}",partitionPathStr, (endTs - beginTs));
       return true;
     });
   }
@@ -289,7 +288,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
   protected boolean isFileSliceAfterPendingCompaction(FileSlice fileSlice) {
     Option<Pair<String, CompactionOperation>> compactionWithInstantTime =
         getPendingCompactionOperationWithInstant(fileSlice.getFileGroupId());
-    LOG.info("Pending Compaction instant for (" + fileSlice + ") is :" + compactionWithInstantTime);
+    LOG.info("Pending Compaction instant for ({}) is :", fileSlice, compactionWithInstantTime);
     return (compactionWithInstantTime.isPresent())
         && fileSlice.getBaseInstantTime().equals(compactionWithInstantTime.get().getKey());
   }
@@ -302,7 +301,7 @@ public abstract class AbstractTableFileSystemView implements SyncableFileSystemV
    */
   protected FileSlice filterDataFileAfterPendingCompaction(FileSlice fileSlice) {
     if (isFileSliceAfterPendingCompaction(fileSlice)) {
-      LOG.info("File Slice (" + fileSlice + ") is in pending compaction");
+      LOG.info("File Slice ({}) is in pending compaction",fileSlice);
       // Data file is filtered out of the file-slice as the corresponding compaction
       // instant not completed yet.
       FileSlice transformed =

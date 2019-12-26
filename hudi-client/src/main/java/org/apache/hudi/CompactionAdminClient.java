@@ -359,13 +359,13 @@ public class CompactionAdminClient extends AbstractHoodieClient {
       if (!dryRun) {
         return jsc.parallelize(renameActions, parallelism).map(lfPair -> {
           try {
-            LOG.info("RENAME " + lfPair.getLeft().getPath() + " => " + lfPair.getRight().getPath());
+            LOG.info("RENAME {} => {}", lfPair.getLeft().getPath(), lfPair.getRight().getPath());
             renameLogFile(metaClient, lfPair.getLeft(), lfPair.getRight());
             return new RenameOpResult(lfPair, true, Option.empty());
           } catch (IOException e) {
             LOG.error("Error renaming log file", e);
-            LOG.error("\n\n\n***NOTE Compaction is in inconsistent state. Try running \"compaction repair "
-                + lfPair.getLeft().getBaseCommitTime() + "\" to recover from failure ***\n\n\n");
+            LOG.error("\n\n\n***NOTE Compaction is in inconsistent state. Try running \"compaction repair {}\" to recover from failure ***\n\n\n",
+                    lfPair.getLeft().getBaseCommitTime());
             return new RenameOpResult(lfPair, false, Option.of(e));
           }
         }).collect();
@@ -396,7 +396,7 @@ public class CompactionAdminClient extends AbstractHoodieClient {
     HoodieCompactionPlan plan = getCompactionPlan(metaClient, compactionInstant);
     if (plan.getOperations() != null) {
       LOG.info(
-          "Number of Compaction Operations :" + plan.getOperations().size() + " for instant :" + compactionInstant);
+          "Number of Compaction Operations :{} for instant: {}", plan.getOperations().size(), compactionInstant);
       List<CompactionOperation> ops = plan.getOperations().stream()
           .map(CompactionOperation::convertFromAvroRecordInstance).collect(Collectors.toList());
       return jsc.parallelize(ops, parallelism).flatMap(op -> {
@@ -410,7 +410,7 @@ public class CompactionAdminClient extends AbstractHoodieClient {
         }
       }).collect();
     }
-    LOG.warn("No operations for compaction instant : " + compactionInstant);
+    LOG.warn("No operations for compaction instant : {}", compactionInstant);
     return new ArrayList<>();
   }
 

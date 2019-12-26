@@ -63,7 +63,7 @@ public class HoodieKeyLookupHandle<T extends HoodieRecordPayload> extends Hoodie
     HoodieTimer timer = new HoodieTimer().startTimer();
     this.bloomFilter = ParquetUtils.readBloomFilterFromParquetMetadata(hoodieTable.getHadoopConf(),
         new Path(getLatestDataFile().getPath()));
-    LOG.info(String.format("Read bloom filter from %s in %d ms", partitionPathFilePair, timer.endTimer()));
+    LOG.info("Read bloom filter from {} in {} ms", partitionPathFilePair, timer.endTimer());
   }
 
   /**
@@ -79,10 +79,10 @@ public class HoodieKeyLookupHandle<T extends HoodieRecordPayload> extends Hoodie
         Set<String> fileRowKeys =
             ParquetUtils.filterParquetRowKeys(configuration, filePath, new HashSet<>(candidateRecordKeys));
         foundRecordKeys.addAll(fileRowKeys);
-        LOG.info(String.format("Checked keys against file %s, in %d ms. #candidates (%d) #found (%d)", filePath,
-            timer.endTimer(), candidateRecordKeys.size(), foundRecordKeys.size()));
+        LOG.info("Checked keys against file {}, in {} ms. #candidates ({}) #found ({})", filePath,
+            timer.endTimer(), candidateRecordKeys.size(), foundRecordKeys.size());
         if (LOG.isDebugEnabled()) {
-          LOG.debug("Keys matching for file " + filePath + " => " + foundRecordKeys);
+          LOG.debug("Keys matching for file {} => {}", filePath, foundRecordKeys);
         }
       }
     } catch (Exception e) {
@@ -98,7 +98,7 @@ public class HoodieKeyLookupHandle<T extends HoodieRecordPayload> extends Hoodie
     // check record key against bloom filter of current file & add to possible keys if needed
     if (bloomFilter.mightContain(recordKey)) {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Record key " + recordKey + " matches bloom filter in  " + partitionPathFilePair);
+        LOG.debug("Record key {} matches bloom filter in {}", recordKey, partitionPathFilePair);
       }
       candidateRecordKeys.add(recordKey);
     }
@@ -110,15 +110,15 @@ public class HoodieKeyLookupHandle<T extends HoodieRecordPayload> extends Hoodie
    */
   public KeyLookupResult getLookupResult() {
     if (LOG.isDebugEnabled()) {
-      LOG.debug("#The candidate row keys for " + partitionPathFilePair + " => " + candidateRecordKeys);
+      LOG.debug("#The candidate row keys for {} => {}", partitionPathFilePair, candidateRecordKeys);
     }
 
     HoodieDataFile dataFile = getLatestDataFile();
     List<String> matchingKeys =
         checkCandidatesAgainstFile(hoodieTable.getHadoopConf(), candidateRecordKeys, new Path(dataFile.getPath()));
     LOG.info(
-        String.format("Total records (%d), bloom filter candidates (%d)/fp(%d), actual matches (%d)", totalKeysChecked,
-            candidateRecordKeys.size(), candidateRecordKeys.size() - matchingKeys.size(), matchingKeys.size()));
+        "Total records ({}), bloom filter candidates ({})/fp({}), actual matches ({})", totalKeysChecked,
+            candidateRecordKeys.size(), candidateRecordKeys.size() - matchingKeys.size(), matchingKeys.size());
     return new KeyLookupResult(partitionPathFilePair.getRight(), partitionPathFilePair.getLeft(),
         dataFile.getCommitTime(), matchingKeys);
   }

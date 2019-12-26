@@ -114,7 +114,7 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
   @VisibleForTesting
   public HBaseIndexQPSResourceAllocator createQPSResourceAllocator(HoodieWriteConfig config) {
     try {
-      LOG.info("createQPSResourceAllocator :" + config.getHBaseQPSResourceAllocatorClass());
+      LOG.info("createQPSResourceAllocator : {}", config.getHBaseQPSResourceAllocatorClass());
       final HBaseIndexQPSResourceAllocator resourceAllocator = (HBaseIndexQPSResourceAllocator) ReflectionUtils
           .loadClass(config.getHBaseQPSResourceAllocatorClass(), config);
       return resourceAllocator;
@@ -321,7 +321,7 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
             doPutsAndDeletes(hTable, puts, deletes);
           } catch (Exception e) {
             Exception we = new Exception("Error updating index for " + writeStatus, e);
-            LOG.error(we.getMessage());
+            LOG.error("Process exited with an error: {}", we.getMessage());
             writeStatus.setGlobalError(we);
           }
           writeStatusList.add(writeStatus);
@@ -371,7 +371,7 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
       HoodieTable<T> hoodieTable) {
     final HBaseIndexQPSResourceAllocator hBaseIndexQPSResourceAllocator = createQPSResourceAllocator(this.config);
     setPutBatchSize(writeStatusRDD, hBaseIndexQPSResourceAllocator, jsc);
-    LOG.info("multiPutBatchSize: before hbase puts" + multiPutBatchSize);
+    LOG.info("multiPutBatchSize: before hbase puts {}", multiPutBatchSize);
     JavaRDD<WriteStatus> writeStatusJavaRDD = writeStatusRDD.mapPartitionsWithIndex(updateLocationFunction(), true);
     // caching the index updated status RDD
     writeStatusJavaRDD = writeStatusJavaRDD.persist(config.getWriteStatusStorageLevel());
@@ -399,15 +399,15 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
       this.numRegionServersForTable = getNumRegionServersAliveForTable();
       final float desiredQPSFraction =
           hBaseIndexQPSResourceAllocator.calculateQPSFractionForPutsTime(numPuts, this.numRegionServersForTable);
-      LOG.info("Desired QPSFraction :" + desiredQPSFraction);
-      LOG.info("Number HBase puts :" + numPuts);
+      LOG.info("Desired QPSFraction : {}", desiredQPSFraction);
+      LOG.info("Number HBase puts : {}", numPuts);
       LOG.info("Hbase Puts Parallelism :" + hbasePutsParallelism);
       final float availableQpsFraction =
           hBaseIndexQPSResourceAllocator.acquireQPSResources(desiredQPSFraction, numPuts);
-      LOG.info("Allocated QPS Fraction :" + availableQpsFraction);
+      LOG.info("Allocated QPS Fraction :{}", availableQpsFraction);
       multiPutBatchSize = putBatchSizeCalculator.getBatchSize(numRegionServersForTable, maxQpsPerRegionServer,
           hbasePutsParallelism, maxExecutors, SLEEP_TIME_MILLISECONDS, availableQpsFraction);
-      LOG.info("multiPutBatchSize :" + multiPutBatchSize);
+      LOG.info("multiPutBatchSize :{}", multiPutBatchSize);
     }
   }
 
@@ -463,15 +463,15 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
       int maxParallelPuts = Math.max(1, Math.min(numTasks, maxExecutors));
       int maxReqsSentPerTaskPerSec = MILLI_SECONDS_IN_A_SECOND / sleepTimeMs;
       int multiPutBatchSize = Math.max(1, maxReqPerSec / (maxParallelPuts * maxReqsSentPerTaskPerSec));
-      LOG.info("HbaseIndexThrottling: qpsFraction :" + qpsFraction);
-      LOG.info("HbaseIndexThrottling: numRSAlive :" + numRSAlive);
-      LOG.info("HbaseIndexThrottling: maxReqPerSec :" + maxReqPerSec);
-      LOG.info("HbaseIndexThrottling: numTasks :" + numTasks);
-      LOG.info("HbaseIndexThrottling: maxExecutors :" + maxExecutors);
-      LOG.info("HbaseIndexThrottling: maxParallelPuts :" + maxParallelPuts);
-      LOG.info("HbaseIndexThrottling: maxReqsSentPerTaskPerSec :" + maxReqsSentPerTaskPerSec);
-      LOG.info("HbaseIndexThrottling: numRegionServersForTable :" + numRegionServersForTable);
-      LOG.info("HbaseIndexThrottling: multiPutBatchSize :" + multiPutBatchSize);
+      LOG.info("HbaseIndexThrottling: qpsFraction :{}", qpsFraction);
+      LOG.info("HbaseIndexThrottling: numRSAlive :{}", numRSAlive);
+      LOG.info("HbaseIndexThrottling: maxReqPerSec :{}", maxReqPerSec);
+      LOG.info("HbaseIndexThrottling: numTasks :{}", numTasks);
+      LOG.info("HbaseIndexThrottling: maxExecutors :{}", maxExecutors);
+      LOG.info("HbaseIndexThrottling: maxParallelPuts :{}", maxParallelPuts);
+      LOG.info("HbaseIndexThrottling: maxReqsSentPerTaskPerSec :{}", maxReqsSentPerTaskPerSec);
+      LOG.info("HbaseIndexThrottling: numRegionServersForTable :{}", numRegionServersForTable);
+      LOG.info("HbaseIndexThrottling: multiPutBatchSize :{}", multiPutBatchSize);
       return multiPutBatchSize;
     }
   }
@@ -486,7 +486,7 @@ public class HBaseIndex<T extends HoodieRecordPayload> extends HoodieIndex<T> {
             .toIntExact(regionLocator.getAllRegionLocations().stream().map(e -> e.getServerName()).distinct().count());
         return numRegionServersForTable;
       } catch (IOException e) {
-        LOG.error(e.getMessage());
+        LOG.error("Process exited with an error: {}",e.getMessage());
         throw new RuntimeException(e);
       }
     }

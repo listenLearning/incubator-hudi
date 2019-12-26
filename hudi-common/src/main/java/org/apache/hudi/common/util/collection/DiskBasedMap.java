@@ -110,9 +110,8 @@ public final class DiskBasedMap<T extends Serializable, R extends Serializable> 
       writeOnlyFile.getParentFile().mkdir();
     }
     writeOnlyFile.createNewFile();
-    LOG.info("Spilling to file location " + writeOnlyFile.getAbsolutePath() + " in host ("
-        + InetAddress.getLocalHost().getHostAddress() + ") with hostname (" + InetAddress.getLocalHost().getHostName()
-        + ")");
+    LOG.info("Spilling to file location {} in host ({}) with hostname ({})",
+            new Object[]{writeOnlyFile.getAbsolutePath(), InetAddress.getLocalHost().getHostAddress(), InetAddress.getLocalHost().getHostName()});
     // Make sure file is deleted when JVM exits
     writeOnlyFile.deleteOnExit();
     addShutDownHook();

@@ -155,8 +155,7 @@ public class HoodieMetrics {
 
   public void updateRollbackMetrics(long durationInMs, long numFilesDeleted) {
     if (config.isMetricsOn()) {
-      LOG.info(
-          String.format("Sending rollback metrics (duration=%d, numFilesDeleted=%d)", durationInMs, numFilesDeleted));
+      LOG.info("Sending rollback metrics (duration={}, numFilesDeleted={})", durationInMs, numFilesDeleted);
       Metrics.registerGauge(getMetricsName("rollback", "duration"), durationInMs);
       Metrics.registerGauge(getMetricsName("rollback", "numFilesDeleted"), numFilesDeleted);
     }
@@ -164,8 +163,7 @@ public class HoodieMetrics {
 
   public void updateCleanMetrics(long durationInMs, int numFilesDeleted) {
     if (config.isMetricsOn()) {
-      LOG.info(
-          String.format("Sending clean metrics (duration=%d, numFilesDeleted=%d)", durationInMs, numFilesDeleted));
+      LOG.info("Sending clean metrics (duration={}, numFilesDeleted={})", durationInMs, numFilesDeleted);
       Metrics.registerGauge(getMetricsName("clean", "duration"), durationInMs);
       Metrics.registerGauge(getMetricsName("clean", "numFilesDeleted"), numFilesDeleted);
     }
@@ -173,8 +171,8 @@ public class HoodieMetrics {
 
   public void updateFinalizeWriteMetrics(long durationInMs, long numFilesFinalized) {
     if (config.isMetricsOn()) {
-      LOG.info(String.format("Sending finalize write metrics (duration=%d, numFilesFinalized=%d)", durationInMs,
-          numFilesFinalized));
+      LOG.info("Sending finalize write metrics (duration={}, numFilesFinalized={})", durationInMs,
+          numFilesFinalized);
       Metrics.registerGauge(getMetricsName("finalize", "duration"), durationInMs);
       Metrics.registerGauge(getMetricsName("finalize", "numFilesFinalized"), numFilesFinalized);
     }
@@ -182,7 +180,7 @@ public class HoodieMetrics {
 
   public void updateIndexMetrics(final String action, final long durationInMs) {
     if (config.isMetricsOn()) {
-      LOG.info(String.format("Sending index metrics (%s.duration, %d)", action, durationInMs));
+      LOG.info("Sending index metrics ({}.duration, {})", action, durationInMs);
       Metrics.registerGauge(getMetricsName("index", String.format("%s.duration", action)), durationInMs);
     }
   }

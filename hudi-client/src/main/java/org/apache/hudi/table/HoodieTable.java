@@ -324,7 +324,7 @@ public abstract class HoodieTable<T extends HoodieRecordPayload> implements Seri
       Path markerDir = new Path(metaClient.getMarkerFolderPath(instantTs));
       if (fs.exists(markerDir)) {
         // For append only case, we do not write to marker dir. Hence, the above check
-        LOG.info("Removing marker directory=" + markerDir);
+        LOG.info("Removing marker directory={}", markerDir);
         fs.delete(markerDir, true);
       }
     } catch (IOException ioe) {
@@ -363,7 +363,7 @@ public abstract class HoodieTable<T extends HoodieRecordPayload> implements Seri
       invalidDataPaths.removeAll(validDataPaths);
       if (!invalidDataPaths.isEmpty()) {
         LOG.info(
-            "Removing duplicate data files created due to spark retries before committing. Paths=" + invalidDataPaths);
+            "Removing duplicate data files created due to spark retries before committing. Paths={}", invalidDataPaths);
       }
 
       Map<String, List<Pair<String, String>>> groupByPartition = invalidDataPaths.stream()
@@ -381,7 +381,7 @@ public abstract class HoodieTable<T extends HoodieRecordPayload> implements Seri
         jsc.parallelize(new ArrayList<>(groupByPartition.values()), config.getFinalizeWriteParallelism())
             .map(partitionWithFileList -> {
               final FileSystem fileSystem = metaClient.getFs();
-              LOG.info("Deleting invalid data files=" + partitionWithFileList);
+              LOG.info("Deleting invalid data files={}", partitionWithFileList);
               if (partitionWithFileList.isEmpty()) {
                 return true;
               }

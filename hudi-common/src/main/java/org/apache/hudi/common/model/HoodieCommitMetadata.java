@@ -118,7 +118,7 @@ public class HoodieCommitMetadata implements Serializable {
 
   public String toJsonString() throws IOException {
     if (partitionToWriteStats.containsKey(null)) {
-      LOG.info("partition path is null for " + partitionToWriteStats.get(null));
+      LOG.info("partition path is null for {}", partitionToWriteStats.get(null));
       partitionToWriteStats.remove(null);
     }
     return getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);

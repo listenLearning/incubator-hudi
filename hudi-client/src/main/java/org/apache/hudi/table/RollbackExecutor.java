@@ -181,7 +181,7 @@ public class RollbackExecutor implements Serializable {
    */
   private Map<FileStatus, Boolean> deleteCleanedFiles(HoodieTableMetaClient metaClient, HoodieWriteConfig config,
       Map<FileStatus, Boolean> results, String partitionPath, PathFilter filter) throws IOException {
-    LOG.info("Cleaning path " + partitionPath);
+    LOG.info("Cleaning path {}", partitionPath);
     FileSystem fs = metaClient.getFs();
     FileStatus[] toBeDeleted = fs.listStatus(FSUtils.getPartitionPath(config.getBasePath(), partitionPath), filter);
     for (FileStatus file : toBeDeleted) {
@@ -197,7 +197,7 @@ public class RollbackExecutor implements Serializable {
    */
   private Map<FileStatus, Boolean> deleteCleanedFiles(HoodieTableMetaClient metaClient, HoodieWriteConfig config,
       Map<FileStatus, Boolean> results, String commit, String partitionPath) throws IOException {
-    LOG.info("Cleaning path " + partitionPath);
+    LOG.info("Cleaning path {}", partitionPath);
     FileSystem fs = metaClient.getFs();
     PathFilter filter = (path) -> {
       if (path.toString().contains(".parquet")) {
@@ -210,7 +210,7 @@ public class RollbackExecutor implements Serializable {
     for (FileStatus file : toBeDeleted) {
       boolean success = fs.delete(file.getPath(), false);
       results.put(file, success);
-      LOG.info("Delete file " + file.getPath() + "\t" + success);
+      LOG.info("Delete file {}\t{}", file.getPath(), success);
     }
     return results;
   }

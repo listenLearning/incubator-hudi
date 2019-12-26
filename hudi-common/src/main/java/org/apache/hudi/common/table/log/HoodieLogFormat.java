@@ -85,14 +85,14 @@ public interface HoodieLogFormat {
 
     /**
      * Read log file in reverse order and check if prev block is present.
-     * 
+     *
      * @return
      */
     public boolean hasPrev();
 
     /**
      * Read log file in reverse order and return prev block if present.
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -210,7 +210,7 @@ public interface HoodieLogFormat {
       }
 
       if (logVersion == null) {
-        LOG.info("Computing the next log version for " + logFileId + " in " + parentPath);
+        LOG.info("Computing the next log version for {} in {}", logFileId, parentPath);
         Option<Pair<Integer, String>> versionAndWriteToken =
             FSUtils.getLatestLogVersion(fs, parentPath, logFileId, fileExtension, commitTime);
         if (versionAndWriteToken.isPresent()) {
@@ -222,8 +222,8 @@ public interface HoodieLogFormat {
           // Use rollover write token as write token to create new log file with tokens
           logWriteToken = rolloverLogWriteToken;
         }
-        LOG.info("Computed the next log version for " + logFileId + " in " + parentPath + " as " + logVersion
-            + " with write-token " + logWriteToken);
+        // LOG.info("Computed the next log version for {} in {} as {} with write-token {}", logFileId, parentPath, logVersion, logWriteToken);
+        LOG.info("Computed the next log version for {} in {} as {} with write-token {}",new Object[]{logFileId, parentPath, logVersion, logWriteToken});
       }
 
       if (logWriteToken == null) {
@@ -234,7 +234,7 @@ public interface HoodieLogFormat {
 
       Path logPath = new Path(parentPath,
           FSUtils.makeLogFileName(logFileId, fileExtension, commitTime, logVersion, logWriteToken));
-      LOG.info("HoodieLogFile on path " + logPath);
+      LOG.info("HoodieLogFile on path {}", logPath);
       HoodieLogFile logFile = new HoodieLogFile(logPath);
 
       if (bufferSize == null) {

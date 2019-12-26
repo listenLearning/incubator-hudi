@@ -73,7 +73,7 @@ public class HoodieCreateHandle<T extends HoodieRecordPayload> extends HoodieWri
     } catch (IOException e) {
       throw new HoodieInsertException("Failed to initialize HoodieStorageWriter for path " + path, e);
     }
-    LOG.info("New CreateHandle for partition :" + partitionPath + " with fileId " + fileId);
+    LOG.info("New CreateHandle for partition: {} with fileId {}", partitionPath, fileId);
   }
 
   /**
@@ -119,7 +119,7 @@ public class HoodieCreateHandle<T extends HoodieRecordPayload> extends HoodieWri
       // Not throwing exception from here, since we don't want to fail the entire job
       // for a single record
       writeStatus.markFailure(record, t, recordMetadata);
-      LOG.error("Error writing record " + record, t);
+      LOG.error("Error writing record {}", record, t);
     }
   }
 
@@ -174,8 +174,8 @@ public class HoodieCreateHandle<T extends HoodieRecordPayload> extends HoodieWri
       stat.setRuntimeStats(runtimeStats);
       writeStatus.setStat(stat);
 
-      LOG.info(String.format("CreateHandle for partitionPath %s fileID %s, took %d ms.", stat.getPartitionPath(),
-          stat.getFileId(), runtimeStats.getTotalCreateTime()));
+      LOG.info("CreateHandle for partitionPath {} fileID {}, took {} ms.", stat.getPartitionPath(),
+          stat.getFileId(), runtimeStats.getTotalCreateTime());
 
       return writeStatus;
     } catch (IOException e) {

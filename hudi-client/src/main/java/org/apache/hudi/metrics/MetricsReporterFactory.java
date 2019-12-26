@@ -45,7 +45,7 @@ public class MetricsReporterFactory {
         reporter = new JmxMetricsReporter(config);
         break;
       default:
-        LOG.error("Reporter type[" + type + "] is not supported.");
+        LOG.error("Reporter type[{}] is not supported.", type);
         break;
     }
     return reporter;

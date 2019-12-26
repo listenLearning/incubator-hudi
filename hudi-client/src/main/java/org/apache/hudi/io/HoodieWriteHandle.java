@@ -97,7 +97,7 @@ public abstract class HoodieWriteHandle<T extends HoodieRecordPayload> extends H
   protected void createMarkerFile(String partitionPath) {
     Path markerPath = makeNewMarkerPath(partitionPath);
     try {
-      LOG.info("Creating Marker Path=" + markerPath);
+      LOG.info("Creating Marker Path= {}", markerPath);
       fs.create(markerPath, false).close();
     } catch (IOException e) {
       throw new HoodieException("Failed to create marker file " + markerPath, e);
@@ -147,7 +147,7 @@ public abstract class HoodieWriteHandle<T extends HoodieRecordPayload> extends H
     if (exception.isPresent() && exception.get() instanceof Throwable) {
       // Not throwing exception from here, since we don't want to fail the entire job for a single record
       writeStatus.markFailure(record, exception.get(), recordMetadata);
-      LOG.error("Error writing record " + record, exception.get());
+      LOG.error("Error writing record {}", record, exception.get());
     } else {
       write(record, avroRecord);
     }
