@@ -313,7 +313,7 @@ public class HiveIncrementalPuller {
         .findInstantsAfter(config.fromCommitTime, config.maxCommits).getInstants().map(HoodieInstant::getTimestamp)
         .collect(Collectors.toList());
     if (commitsToSync.isEmpty()) {
-        LOG.warn("Nothing to sync. All commits in {} are {} and and from commit time is {}",config.sourceTable,
+      LOG.warn("Nothing to sync. All commits in {} are {} and and from commit time is {}",config.sourceTable,
                 metadata.getActiveTimeline().getCommitsTimeline().filterCompletedInstants().getInstants().collect(Collectors.toList()),
                 config.fromCommitTime);
       return null;
