@@ -55,11 +55,15 @@ class HoodieStreamingSink(sqlContext: SQLContext,
           data)
       ) match {
         case Success((true, commitOps)) =>
-          log.info(s"Micro batch id=$batchId succeeded"
+          /*log.info(s"Micro batch id=$batchId succeeded"
             + (commitOps.isPresent match {
                 case true => s" for commit=${commitOps.get()}"
                 case _ => s" with no new commits"
-            }))
+            }))*/
+          log.info("Micro batch id={} succeeded {}",batchId,(commitOps.isPresent match {
+            case true => s"for commit=${commitOps.get()}"
+            case _ => s"with no new commits"
+          }))
           Success((true, commitOps))
         case Failure(e) =>
           // clean up persist rdds in the write process
@@ -68,42 +72,39 @@ class HoodieStreamingSink(sqlContext: SQLContext,
               case (id, rdd) =>
                 rdd.unpersist()
             }
-          log.error(s"Micro batch id=$batchId threw following expection: ", e)
+          log.error("Micro batch id={} threw following expection: {}", batchId, e)
           if (ignoreFailedBatch) {
-            log.info(s"Ignore the exception and move on streaming as per " +
-              s"${DataSourceWriteOptions.STREAMING_IGNORE_FAILED_BATCH_OPT_KEY} configuration")
+            log.info("Ignore the exception and move on streaming as per {} configuration", DataSourceWriteOptions.STREAMING_IGNORE_FAILED_BATCH_OPT_KEY)
             Success((true, None))
           } else {
-            if (retryCnt > 1) log.info(s"Retrying the failed micro batch id=$batchId ...")
+            if (retryCnt > 1) log.info("Retrying the failed micro batch id={} ...",batchId)
             Failure(e)
           }
         case Success((false, commitOps)) =>
-          log.error(s"Micro batch id=$batchId ended up with errors"
-            + (commitOps.isPresent match {
+          log.error("Micro batch id={} ended up with errors {}",batchId, (commitOps.isPresent match {
               case true =>  s" for commit=${commitOps.get()}"
               case _ => s""
             }))
           if (ignoreFailedBatch) {
-            log.info(s"Ignore the errors and move on streaming as per " +
-              s"${DataSourceWriteOptions.STREAMING_IGNORE_FAILED_BATCH_OPT_KEY} configuration")
+            log.info("Ignore the errors and move on streaming as per {} configuration", DataSourceWriteOptions.STREAMING_IGNORE_FAILED_BATCH_OPT_KEY)
             Success((true, None))
           } else {
-            if (retryCnt > 1) log.info(s"Retrying the failed micro batch id=$batchId ...")
+            if (retryCnt > 1) log.info("Retrying the failed micro batch id={} ...", batchId)
             Failure(new HoodieCorruptedDataException(s"Micro batch id=$batchId ended up with errors"))
           }
       }
     ) match {
       case Failure(e) =>
         if (!ignoreFailedBatch) {
-          log.error(s"Micro batch id=$batchId threw following expections," +
-            s"aborting streaming app to avoid data loss: ", e)
+          log.error("Micro batch id={} threw following expections," +
+            "aborting streaming app to avoid data loss: {}",batchId, e)
           // spark sometimes hangs upon exceptions and keep on hold of the executors
           // this is to force exit upon errors / exceptions and release all executors
           // will require redeployment / supervise mode to restart the streaming
           System.exit(1)
         }
       case Success(_) =>
-        log.info(s"Micro batch id=$batchId succeeded")
+        log.info("Micro batch id={} succeeded", batchId)
     }
   }
 

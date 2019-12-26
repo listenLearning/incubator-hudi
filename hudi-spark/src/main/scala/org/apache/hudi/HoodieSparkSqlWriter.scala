@@ -65,9 +65,8 @@ private[hudi] object HoodieSparkSqlWriter {
       if (parameters(INSERT_DROP_DUPS_OPT_KEY).toBoolean &&
         parameters(OPERATION_OPT_KEY) == UPSERT_OPERATION_OPT_VAL) {
 
-        log.warn(s"$UPSERT_OPERATION_OPT_VAL is not applicable " +
-          s"when $INSERT_DROP_DUPS_OPT_KEY is set to be true, " +
-          s"overriding the $OPERATION_OPT_KEY to be $INSERT_OPERATION_OPT_VAL")
+        log.warn("{} is not applicable when {} is set to be true, overriding the {} to be {}",
+          Array(UPSERT_OPERATION_OPT_VAL, INSERT_DROP_DUPS_OPT_KEY, OPERATION_OPT_KEY, INSERT_OPERATION_OPT_VAL): _*)
 
         INSERT_OPERATION_OPT_VAL
       } else {
@@ -95,7 +94,7 @@ private[hudi] object HoodieSparkSqlWriter {
           classOf[org.apache.avro.Schema]))
       val schema = AvroConversionUtils.convertStructTypeToAvroSchema(df.schema, structName, nameSpace)
       sparkContext.getConf.registerAvroSchemas(schema)
-      log.info(s"Registered avro schema : ${schema.toString(true)}")
+      log.info("Registered avro schema : {}", schema.toString(true))
 
       // Convert to RDD[HoodieRecord]
       val keyGenerator = DataSourceUtils.createKeyGenerator(toProperties(parameters))
@@ -112,11 +111,11 @@ private[hudi] object HoodieSparkSqlWriter {
         throw new HoodieException(s"hoodie dataset at $basePath already exists.")
       }
       if (mode == SaveMode.Ignore && exists) {
-        log.warn(s"hoodie dataset at $basePath already exists. Ignoring & not performing actual writes.")
+        log.warn("hoodie dataset at {} already exists. Ignoring & not performing actual writes.", basePath)
         (true, common.util.Option.empty())
       }
       if (mode == SaveMode.Overwrite && exists) {
-        log.warn(s"hoodie dataset at $basePath already exists. Deleting existing data & overwriting with new data.")
+        log.warn("hoodie dataset at {} already exists. Deleting existing data & overwriting with new data.", basePath)
         fs.delete(basePath, true)
         exists = false
       }
@@ -163,15 +162,15 @@ private[hudi] object HoodieSparkSqlWriter {
           }
 
           if (commitSuccess) {
-            log.info("Commit " + commitTime + " successful!")
+            log.info("Commit {} successful!", commitTime)
           }
           else {
-            log.info("Commit " + commitTime + " failed!")
+            log.info("Commit {} failed!", commitTime)
           }
 
           val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
           val syncHiveSucess = if (hiveSyncEnabled) {
-            log.info("Syncing to Hive Metastore (URL: " + parameters(HIVE_URL_OPT_KEY) + ")")
+            log.info("Syncing to Hive Metastore (URL: {})", parameters(HIVE_URL_OPT_KEY))
             val fs = FSUtils.getFs(basePath.toString, jsc.hadoopConfiguration)
             syncHive(basePath, fs, parameters)
           } else {
@@ -180,16 +179,16 @@ private[hudi] object HoodieSparkSqlWriter {
           client.close()
           commitSuccess && syncHiveSucess
         } else {
-          log.error(s"$operation failed with ${errorCount} errors :");
+          log.error("{} failed with {} errors :", operation, errorCount);
           if (log.isTraceEnabled) {
             log.trace("Printing out the top 100 errors")
             writeStatuses.rdd.filter(ws => ws.hasErrors)
               .take(100)
               .foreach(ws => {
-                log.trace("Global error :", ws.getGlobalError)
+                log.trace("Global error :{}", ws.getGlobalError)
                 if (ws.getErrors.size() > 0) {
                   ws.getErrors.foreach(kt =>
-                    log.trace(s"Error for key: ${kt._1}", kt._2))
+                    log.trace("Error for key: {},{}", Array(kt._1, kt._2): _*))
                 }
               })
           }
@@ -240,15 +239,15 @@ private[hudi] object HoodieSparkSqlWriter {
           }
 
           if (commitSuccess) {
-            log.info("Commit " + commitTime + " successful!")
+            log.info("Commit {} successful!", commitTime)
           }
           else {
-            log.info("Commit " + commitTime + " failed!")
+            log.info("Commit {} failed!", commitTime)
           }
 
           val hiveSyncEnabled = parameters.get(HIVE_SYNC_ENABLED_OPT_KEY).exists(r => r.toBoolean)
           val syncHiveSucess = if (hiveSyncEnabled) {
-            log.info("Syncing to Hive Metastore (URL: " + parameters(HIVE_URL_OPT_KEY) + ")")
+            log.info("Syncing to Hive Metastore (URL: {})", parameters(HIVE_URL_OPT_KEY))
             val fs = FSUtils.getFs(basePath.toString, jsc.hadoopConfiguration)
             syncHive(basePath, fs, parameters)
           } else {
@@ -257,7 +256,7 @@ private[hudi] object HoodieSparkSqlWriter {
           client.close()
           commitSuccess && syncHiveSucess
         } else {
-          log.error(s"$operation failed with ${errorCount} errors :");
+          log.error("{} failed with {} errors :", operation, errorCount);
           if (log.isTraceEnabled) {
             log.trace("Printing out the top 100 errors")
             writeStatuses.rdd.filter(ws => ws.hasErrors)
@@ -266,7 +265,7 @@ private[hudi] object HoodieSparkSqlWriter {
                 log.trace("Global error :", ws.getGlobalError)
                 if (ws.getErrors.size() > 0) {
                   ws.getErrors.foreach(kt =>
-                    log.trace(s"Error for key: ${kt._1}", kt._2))
+                    log.trace("Error for key: {},{}", Array(kt._1, kt._2): _*))
                 }
               })
           }
@@ -278,11 +277,11 @@ private[hudi] object HoodieSparkSqlWriter {
   }
 
   /**
-    * Add default options for unspecified write options keys.
-    *
-    * @param parameters
-    * @return
-    */
+   * Add default options for unspecified write options keys.
+   *
+   * @param parameters
+   * @return
+   */
   def parametersWithWriteDefaults(parameters: Map[String, String]): Map[String, String] = {
     Map(OPERATION_OPT_KEY -> DEFAULT_OPERATION_OPT_VAL,
       STORAGE_TYPE_OPT_KEY -> DEFAULT_STORAGE_TYPE_OPT_VAL,

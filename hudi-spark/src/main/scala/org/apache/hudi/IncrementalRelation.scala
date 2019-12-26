@@ -107,7 +107,7 @@ class IncrementalRelation(val sqlContext: SQLContext,
     if (fileIdToFullPath.isEmpty) {
       sqlContext.sparkContext.emptyRDD[Row]
     } else {
-      log.info("Additional Filters to be applied to incremental source are :" + filters)
+      log.info("Additional Filters to be applied to incremental source are :{}", filters)
       filters.foldLeft(sqlContext.read.options(sOpts)
         .schema(latestSchema)
         .parquet(fileIdToFullPath.values.toList: _*)

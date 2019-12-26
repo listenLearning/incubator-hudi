@@ -71,7 +71,7 @@ class DefaultSource extends RelationProvider
         classOf[HoodieROTablePathFilter],
         classOf[org.apache.hadoop.fs.PathFilter]);
 
-      log.info("Constructing hoodie (as parquet) data source with options :" + parameters)
+      log.info("Constructing hoodie (as parquet) data source with options : {}", parameters)
       // simply return as a regular parquet relation
       DataSource.apply(
         sparkSession = sqlContext.sparkSession,
