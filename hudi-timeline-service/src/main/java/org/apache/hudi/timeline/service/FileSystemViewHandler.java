@@ -87,8 +87,8 @@ public class FileSystemViewHandler {
     HoodieTimeline localTimeline =
         viewManager.getFileSystemView(basePath).getTimeline().filterCompletedAndCompactionInstants();
     if (LOG.isDebugEnabled()) {
-      LOG.debug("Client [ LastTs=" + lastKnownInstantFromClient + ", TimelineHash=" + timelineHashFromClient
-          + "], localTimeline=" + localTimeline.getInstants().collect(Collectors.toList()));
+      LOG.debug("Client [ LastTs={}, TimelineHash={}], localTimeline={}",
+              lastKnownInstantFromClient,timelineHashFromClient, localTimeline.getInstants().collect(Collectors.toList()));
     }
 
     if ((localTimeline.getInstants().count() == 0)
@@ -117,9 +117,8 @@ public class FileSystemViewHandler {
       synchronized (view) {
         if (isLocalViewBehind(ctx)) {
           HoodieTimeline localTimeline = viewManager.getFileSystemView(basePath).getTimeline();
-          LOG.warn("Syncing view as client passed last known instant " + lastKnownInstantFromClient
-              + " as last known instant but server has the folling timeline :"
-              + localTimeline.getInstants().collect(Collectors.toList()));
+          LOG.warn("Syncing view as client passed last known instant {} as last known instant but server has the folling timeline :{}",
+                  lastKnownInstantFromClient, localTimeline.getInstants().collect(Collectors.toList()));
           view.sync();
           return true;
         }
@@ -134,7 +133,7 @@ public class FileSystemViewHandler {
     String result =
         prettyPrint ? OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj) : OBJECT_MAPPER.writeValueAsString(obj);
     long endJsonTs = System.currentTimeMillis();
-    LOG.debug("Jsonify TimeTaken=" + (endJsonTs - beginJsonTs));
+    LOG.debug("Jsonify TimeTaken= {}", (endJsonTs - beginJsonTs));
     ctx.result(result);
   }
 
@@ -345,7 +344,7 @@ public class FileSystemViewHandler {
         }
       } catch (RuntimeException re) {
         success = false;
-        LOG.error("Got runtime exception servicing request " + context.queryString(), re);
+        LOG.error("Got runtime exception servicing request {}", context.queryString(), re);
         throw re;
       } finally {
         long endTs = System.currentTimeMillis();

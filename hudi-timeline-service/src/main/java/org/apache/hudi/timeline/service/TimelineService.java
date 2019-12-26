@@ -106,7 +106,7 @@ public class TimelineService {
     app.start(serverPort);
     // If port = 0, a dynamic port is assigned. Store it.
     serverPort = app.port();
-    LOG.info("Starting Timeline server on port :" + serverPort);
+    LOG.info("Starting Timeline server on port : {}", serverPort);
     return serverPort;
   }
 
